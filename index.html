@@ -1,185 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Birthday Notes 🎂</title>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f9f7f7, #e3f2fd);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    h1 {
-      margin: 20px;
-      color: #333;
-    }
-    #playMusicBtn {
-      margin: 10px auto;
-      display: block;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      background: #ff4081;
-      color: white;
-      cursor: pointer;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      max-width: 1000px;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      width: 250px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: transform 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-    .card h3 { margin: 0; color: #444; }
-    .card p { display: none; margin-top: 10px; color: #555; }
-    .card.open p { display: block; }
-    .card:hover { transform: translateY(-5px); }
-    /* Animations */
-    .fadePop { animation: fadePop 0.6s ease; }
-    @keyframes fadePop {0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; }}
-    .glowPulse { animation: glowPulse 1.2s ease; }
-    @keyframes glowPulse {0%,100% { box-shadow: 0 0 0px #ffd700; } 50% { box-shadow: 0 0 20px #ffd700; }}
-    .wiggle { animation: wiggle 0.4s ease; }
-    @keyframes wiggle {25% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } 75% { transform: rotate(1deg); } 100% { transform: rotate(0deg); }}
+    :root{--accent:#ff4081;--card-bg:#ffffff;--soft:#fff5f8}
+    html,body{height:100%;margin:0}
+    body{font-family:Inter, Poppins, Arial, sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;color:#333}
+    .bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(120deg,#ffe6f0,#fff9e6);animation:bgShift 12s ease-in-out infinite}
+    @keyframes bgShift{0%{background:linear-gradient(120deg,#ffe6f0,#fff9e6)}50%{background:linear-gradient(120deg,#fff9e6,#e6f7ff)}100%{background:linear-gradient(120deg,#ffe6f0,#fff9e6)}}
+
+    /* scattered emoji background */
+    .emoji-bg {position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+    .emoji-bg span {position:absolute;font-size:24px;opacity:0.12;animation:floaty 14s infinite ease-in-out}
+    @keyframes floaty {0%{transform:translateY(0px) rotate(0deg);}50%{transform:translateY(-22px) rotate(12deg);}100%{transform:translateY(0px) rotate(0deg);}}
+
+    header{width:100%;max-width:1100px;padding:18px;display:flex;flex-direction:column;align-items:center;margin-top:16px;background:rgba(255,255,255,0.72);backdrop-filter:blur(8px);border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
+    h1{margin:0;font-size:22px;background:linear-gradient(90deg,#ff4081,#ff9800);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .meta{display:flex;gap:12px;align-items:center;margin-top:12px}
+    #countdown{font-weight:600;color:#444}
+    #progressWrap{width:100%;max-width:760px;margin-top:14px}
+    .progress{height:10px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff98c8);width:0%;transition:width 600ms ease}
+    .container{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;padding:22px;max-width:1100px;width:100%;box-sizing:border-box}
+    .cardWrap{perspective:1000px}
+    .card{background:var(--card-bg);border-radius:14px;padding:18px;text-align:center;box-shadow:0 8px 26px rgba(17,12,38,0.06);cursor:pointer;position:relative;overflow:visible;min-height:120px;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.3,1)}
+    .card.flipped{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;border-radius:14px;backface-visibility:hidden}
+    .front{background:var(--card-bg)}
+    .back{transform:rotateY(180deg);background:linear-gradient(180deg,#fff,#fff7fb)}
+    .card h3{margin:0;font-size:16px}
+    .card p{margin-top:8px;color:#444;font-size:15px;line-height:1.3}
+    .badge {position: absolute;top: 12px;right: 12px;background: rgba(255,64,129,0.12);color: var(--accent);padding: 6px 8px;border-radius: 999px;font-size: 13px;transform: rotateY(0deg);backface-visibility: hidden;z-index: 3}
+    .emoji{position:fixed;pointer-events:none;z-index:9999;will-change:transform,opacity}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .overlay .box{background:linear-gradient(90deg,#fff,#fff7fb);padding:30px 36px;border-radius:14px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,0.25)}
+    .overlay h2{margin:0 0 8px;color:var(--accent);font-size:28px}
+    footer{margin:26px 0 46px;color:#777}
+
+    /* Locked card blur effect with glow */
+    .card.locked { pointer-events: none; position: relative; animation: pulseGlow 2.5s infinite; }
+    .card.locked .face { filter: blur(4px) brightness(0.9); }
+    .card.locked::after { content: "🔒"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 8px; font-weight: bold; color: var(--accent); z-index: 2; }
+    @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 10px rgba(255,64,129,0.3); } 50% { box-shadow: 0 0 22px rgba(255,64,129,0.6); } }
+
+    @media (max-width:520px){.card{min-height:140px}}
   </style>
 </head>
 <body>
-<h1>🎁 Birthday Notes Countdown 🎁</h1>
-<button id="playMusicBtn">🎵 Play Music</button>
-<div class="container" id="notesContainer"></div>
+<div class="bg" aria-hidden="true"></div>
+<div class="emoji-bg" aria-hidden="true"></div>
+<header>
+  <h1>🎉 Insarah’s Birthday Countdown 🧿🤍</h1>
+  <div class="meta">
+    <div id="countdown">Starts Sep 19 — <span id="daysLeft">loading...</span> left</div>
+  </div>
+  <div id="progressWrap">
+    <div class="progress"><i id="progressBar"></i></div>
+  </div>
+</header>
 
+<section class="container" id="notesContainer" aria-live="polite"></section>
+<div class="overlay" id="birthdayOverlay">
+  <div class="box">
+    <h2>Happy Birthday! ❤️</h2>
+    <p>Wishing you the most beautiful day — with all my love.</p>
+  </div>
+</div>
+<audio id="bgAudio" preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
-  const preview = true; // true for testing, false before sharing
+  document.addEventListener('DOMContentLoaded', ()=>{
+    try{
+      const preview = true; // set false before share — now set to false for real countdown
+      const nickname = "Chubby Cheek";
 
-  const songs = [
-    "music/2025-09-20.mp3","music/2025-09-21.mp3","music/2025-09-22.mp3","music/2025-09-23.mp3",
-    "music/2025-09-24.mp3","music/2025-09-25.mp3","music/2025-09-26.mp3","music/2025-09-27.mp3",
-    "music/2025-09-28.mp3","music/2025-09-29.mp3","music/2025-09-30.mp3","music/2025-10-01.mp3",
-    "music/2025-10-02.mp3","music/2025-10-03.mp3","music/2025-10-04.mp3","music/2025-10-05.mp3",
-    "music/2025-10-06.mp3","music/2025-10-07.mp3","music/2025-10-08.mp3"
-  ];
+      // --- emotional notes (rewritten) ---
+      const notes = [
+        {date:'2025-09-19', title:"Day 0 — Couldn’t Wait, So I Started 💌", text:"I wanted to wait, but every time I think of you I can’t help but smile. Consider this an early little love note — for when you wake up and find someone already thinking of you."},
+        {date:'2025-09-20', title:"Day 1 — My Sunrise For Today 🌅", text:"The first thought that greets me every morning is you — you make the ordinary feel like the start of something beautiful."},
+        {date:'2025-09-21', title:"Day 2 — The Smile That Stole My Heart 🌸", text:"When you smile I forget the weight of the world. Your smile is the kind of small miracle I want to see on repeat."},
+        {date:'2025-09-22', title:"Day 3 — Your Gentle Presence 🤍", text:"There’s a warmth in the way you listen, the quiet strength in your words. With you, even silence feels like a hug."},
+        {date:'2025-09-23', title:"Day 4 — Bright Little Things ✨", text:"It’s the tiny things you do — the way you laugh, the way you tuck your hair — that become my favorite memories."},
+        {date:'2025-09-24', title:"Day 5 — My Safe Place 🕊️", text:"When the world gets loud, thinking of you is my calm. You’re the quiet corner of my day where everything makes sense."},
+        {date:'2025-09-25', title:"Day 6 — Made of Magic 🎨", text:"You have this way of painting ordinary moments with color. I love how your view of the world surprises me in the best way."},
+        {date:'2025-09-26', title:"Day 7 — The Way You Care 🌿", text:"Your kindness is quiet but fierce. It leaves soft traces in everything you touch — in me most of all."},
+        {date:'2025-09-27', title:"Day 8 — Cozy With You ☕", text:"Just the thought of sharing a lazy Sunday with you makes my heart feel full. You make simple things feel precious."},
+        {date:'2025-09-28', title:"Day 9 — Little Joys You Bring 🌺", text:"You find joy in small moments and somehow make them shine brighter — being near you is a series of happy surprises."},
+        {date:'2025-09-29', title:"Day 10 — My Secret Smile 🌻", text:"I carry little pieces of you in my pocket all day — a look, a laugh — and they keep me smiling, secretly, all day long."},
+        {date:'2025-09-30', title:"Day 11 — Warmth Like Home 🔥", text:"You feel like a favorite sweater and a warm cup of tea — comforting in the best possible way."},
+        {date:'2025-10-01', title:"Day 12 — Your Quiet Strength 🌊", text:"You stand steady and gentle — it’s inspiring. I admire how you handle life with grace and heart."},
+        {date:'2025-10-02', title:"Day 13 — Melody of You 🎵", text:"There’s a rhythm to you that feels like my favorite song. Even quiet moments with you have their own melody."},
+        {date:'2025-10-03', title:"Day 14 — The Little Brave Things 💫", text:"I notice the brave little things you do — the honest words, the kind choices. You’re stronger and softer than you realize."},
+        {date:'2025-10-04', title:"Day 15 — Your Light 🌞", text:"You bring sunshine to the smallest corners. Being with you brightens everything I do."},
+        {date:'2025-10-05', title:"Day 16 — Calm Waves 🌊", text:"When life feels like stormy weather, you are the steady tide that brings me back to shore."},
+        {date:'2025-10-06', title:"Day 17 — Timeless You 🌹", text:"There’s a timelessness to how you carry yourself — elegant, kind, and unforgettable."},
+        {date:'2025-10-07', title:"Day 18 — Almost There — Almost Home 🏠", text:"Tomorrow is your day, and I’m already celebrating the person who makes everything better. I can’t wait."},
+        {date:'2025-10-08', title:"🎂 Happy Birthday — My Everything ❤️", text:"Happy Birthday. Today the world gets to cheer for you loudly, but know this: every day with you feels like a gift. Thank you for being you.", confetti:true}
+      ];
 
-  const notes = [
-    { date: "2025-09-20", title: "Day 1 💌", text: "A little smile to start your countdown ✨" },
-    { date: "2025-09-21", title: "Day 2 🌸", text: "You make the world brighter 🌞" },
-    { date: "2025-09-22", title: "Day 3 🎶", text: "Your vibe is my favorite playlist 🎧" },
-    { date: "2025-09-23", title: "Day 4 🌙", text: "Peaceful like the moonlight 🌌" },
-    { date: "2025-09-24", title: "Day 5 🪷", text: "Simple things remind me of you 💭" },
-    { date: "2025-09-25", title: "Day 6 🌈", text: "You add colors to my days 🌟" },
-    { date: "2025-09-26", title: "Day 7 ✨", text: "Your presence = magic ✨" },
-    { date: "2025-09-27", title: "Day 8 ☕", text: "Warm as coffee on a rainy day 🌧️" },
-    { date: "2025-09-28", title: "Day 9 🌺", text: "Blooming like flowers in spring 🌷" },
-    { date: "2025-09-29", title: "Day 10 🕊️", text: "Peaceful and calming like you 💙" },
-    { date: "2025-09-30", title: "Day 11 ✨", text: "Glow brighter than the stars 🌠" },
-    { date: "2025-10-01", title: "Day 12 💫", text: "Your energy is unmatched 🌟" },
-    { date: "2025-10-02", title: "Day 13 🔮", text: "You are rare, like magic 💜" },
-    { date: "2025-10-03", title: "Day 14 🎵", text: "Every word with you is music 🎼" },
-    { date: "2025-10-04", title: "Day 15 🌞", text: "Your smile = sunshine 🌻" },
-    { date: "2025-10-05", title: "Day 16 🌊", text: "Refreshing like the ocean breeze 💨" },
-    { date: "2025-10-06", title: "Day 17 🌹", text: "Classic, beautiful, timeless ❤️" },
-    { date: "2025-10-07", title: "Day 18 ✨", text: "Just one more day... can’t wait! 🥳" },
-    { date: "2025-10-08", title: "🎂 Happy Birthday 🎂", text: "Today is all about YOU 💖🎉🥳" }
-  ];
+      const songs = [
+        'music/2025-09-19.mp3','music/2025-09-20.mp3','music/2025-09-21.mp3','music/2025-09-22.mp3',
+        'music/2025-09-23.mp3','music/2025-09-24.mp3','music/2025-09-25.mp3','music/2025-09-26.mp3','music/2025-09-27.mp3',
+        'music/2025-09-28.mp3','music/2025-09-29.mp3','music/2025-09-30.mp3','music/2025-10-01.mp3',
+        'music/2025-10-02.mp3','music/2025-10-03.mp3','music/2025-10-04.mp3','music/2025-10-05.mp3',
+        'music/2025-10-06.mp3','music/2025-10-07.mp3','music/2025-10-08.mp3'
+      ];
 
-  const today = new Date().toISOString().split("T")[0];
+      const container = document.getElementById('notesContainer');
+      const progressBar = document.getElementById('progressBar');
+      const daysLeftEl = document.getElementById('daysLeft');
+      const bgAudio = document.getElementById('bgAudio');
+      const overlay = document.getElementById('birthdayOverlay');
+      const emojiBg = document.querySelector('.emoji-bg');
+      const todayStr = new Date().toISOString().split('T')[0];
 
-  // Single audio instance
-  const audio = new Audio();
-  audio.loop = true;
-  audio.volume = 0.3;
+      const confettiSafe = window.confetti ? window.confetti : function(opts){};
 
-  // Full-screen emoji confetti function
-  function fullScreenEmojiConfetti() {
-    const emojis = ["🌸","✨","💖","🌈","🎵","☀️","🌹"];
-    const count = 50;
+      // scatter faint background emojis
+      try{
+        const bgEmojis = ["💖","💕","💘","💞","🌸","🌟","✨"];
+        if(emojiBg){
+          for(let i=0;i<36;i++){
+            const s=document.createElement('span');
+            s.textContent = bgEmojis[Math.floor(Math.random()*bgEmojis.length)];
+            s.style.left = Math.random()*100 + 'vw';
+            s.style.top = Math.random()*100 + 'vh';
+            s.style.fontSize = (16+Math.random()*26)+'px';
+            s.style.animationDelay = (Math.random()*12)+'s';
+            emojiBg.appendChild(s);
+          }
+        }
+      }catch(e){console.warn('emoji bg failed',e)}
 
-    for (let i = 0; i < count; i++) {
-      const span = document.createElement("span");
-      span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-      span.style.position = "fixed";
-      span.style.fontSize = `${Math.random() * 25 + 15}px`;
-      span.style.left = `${Math.random() * 100}vw`;
-      span.style.top = `-50px`;
-      span.style.opacity = 1;
-      span.style.zIndex = 1000;
-      span.style.pointerEvents = "none";
-      document.body.appendChild(span);
+      function updateProgress(){
+        const start = new Date('2025-09-19');
+        const end = new Date('2025-10-08');
+        const today = new Date();
+        const total = Math.round((end - start) / (1000*60*60*24));
+        const passed = Math.max(0, Math.min(total, Math.round((today - start)/(1000*60*60*24))));
+        const pct = Math.round((passed / total) * 100);
+        if(progressBar) progressBar.style.width = pct + '%';
+        const left = Math.max(Math.round((end - today)/(1000*60*60*24)),0);
+        if(daysLeftEl) daysLeftEl.textContent = left + ' day' + (left===1?'':'s');
+      }
+      updateProgress();
 
-      const xMove = (Math.random() - 0.5) * 200;
-      const yMove = window.innerHeight + 50;
-      const rotate = Math.random() * 360;
+      function playSongImmediate(src){
+        try{
+          if(!bgAudio.src || bgAudio.paused || (bgAudio.currentSrc && !bgAudio.currentSrc.includes(src))){
+            bgAudio.src = src; bgAudio.volume = 0.35;
+            const p = bgAudio.play();
+            if(p && typeof p.then === 'function'){
+              p.catch(err=>{ console.warn('Direct play blocked', err); });
+            }
+            return;
+          }
+        }catch(e){ console.log('playSongImmediate err', e); }
+      }
 
-      span.style.transition = `transform ${2 + Math.random()*1.5}s linear, opacity ${2 + Math.random()*1.5}s linear`;
-      setTimeout(() => {
-        span.style.transform = `translate(${xMove}px, ${yMove}px) rotate(${rotate}deg)`;
-        span.style.opacity = 0;
-      }, 50);
+      function fullScreenEmoji(list,count=40){
+        for(let i=0;i<count;i++){
+          const el=document.createElement('div'); el.className='emoji'; el.textContent=list[Math.floor(Math.random()*list.length)];
+          const size=14+Math.random()*36; el.style.fontSize=size+'px';
+          el.style.left=Math.random()*100+'vw'; el.style.top='-40px'; document.body.appendChild(el);
+          const xMove=(Math.random()-0.5)*(innerWidth*0.6); const yMove=innerHeight+100; const rot=(Math.random()-0.5)*720;
+          const duration=3+Math.random()*2;
+          el.style.transition=`transform ${duration}s cubic-bezier(.2,.9,.3,1), opacity ${duration}s linear`;
+          setTimeout(()=>{ el.style.transform=`translate(${xMove}px, ${yMove}px) rotate(${rot}deg)`; el.style.opacity=0; },30);
+          setTimeout(()=>el.remove(),(duration*1000)+600);
+        }
+      }
 
-      setTimeout(() => document.body.removeChild(span), 3000);
-    }
-  }
-
-  // Create cards
-  const container = document.getElementById("notesContainer");
-
-  notes.forEach((note, index) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<h3>${note.title}</h3><p>${note.text}</p>`;
-
-    if (preview || today >= note.date) {
-      card.addEventListener("click", () => {
-        card.classList.add("open");
-        card.querySelector("p").style.display = "block";
-
-        const d = new Date(note.date);
-        let animClass = "";
-        if (d <= new Date("2025-09-29")) animClass = "fadePop";
-        else if (d <= new Date("2025-10-02")) animClass = "glowPulse";
-        else if (d <= new Date("2025-10-07")) animClass = "wiggle";
-
-        if (note.date !== "2025-10-08") fullScreenEmojiConfetti();
-        else confetti({ particleCount: 200, spread: 120 });
-
-        if (animClass) card.classList.add(animClass);
-
-        audio.src = songs[index];
-        audio.play().catch(e => console.log("Audio play blocked:", e));
+      notes.forEach((note,idx)=>{
+        const wrap=document.createElement('div'); wrap.className='cardWrap';
+        const card=document.createElement('div'); card.className='card';
+        const front=document.createElement('div'); front.className='face front';
+        front.innerHTML=`<h3>${note.title}</h3><p style="font-weight:600;color:#888">Tap to open</p>`;
+        const back=document.createElement('div'); back.className='face back';
+        back.innerHTML=`<h3>${note.title}</h3><p>${note.text}</p>`;
+        card.appendChild(front); card.appendChild(back); wrap.appendChild(card);
+        const badge=document.createElement('div'); badge.className='badge';
+        const unlocked=preview ? true : (todayStr >= note.date);
+        badge.textContent=unlocked?'Open':'Locked'; card.appendChild(badge);
+        if(unlocked){
+          card.addEventListener('click',()=>{
+            if(card.classList.contains('flipped')) return;
+            card.classList.add('flipped');
+            if(note.confetti){
+              fullScreenEmoji(['💖','💕','💘','💞','💟'],120);
+              overlay.classList.add('show');
+              const duration=3000; const interval=450; let elapsed=0;
+              const timer=setInterval(()=>{ confettiSafe({particleCount:220,spread:160}); elapsed+=interval; if(elapsed>=duration) clearInterval(timer); },interval);
+              setTimeout(()=>overlay.classList.remove('show'),duration+800);
+            } else {
+              fullScreenEmoji(['💖','💕','💘','💞','💟'],28);
+            }
+            if(note.date === todayStr){
+          bgAudio.loop = true;
+        } else {
+          bgAudio.loop = false;
+        }
+        // loop automatically if this is today's card
+          if(note.date === todayStr){ bgAudio.loop = true; } else { bgAudio.loop = false; }
+          playSongImmediate(songs[idx]);
+            updateProgress();
+          });
+        } else {
+          card.classList.add('locked');
+        }
+        container.appendChild(wrap);
       });
-    } else {
-      card.style.opacity = "0.5";
-      card.innerHTML = `<h3>${note.title}</h3><p>⏳ Unlocks on ${note.date}</p>`;
-    }
-    container.appendChild(card);
-  });
 
-  // Play Music button logic
-  const playBtn = document.getElementById("playMusicBtn");
-  playBtn.addEventListener("click", () => {
-    audio.src = songs[0];
-    audio.play().catch(e => console.log("Audio play blocked:", e));
-    playBtn.style.display = "none";
+    }catch(err){
+      console.error('Initialization error', err);
+    }
   });
 </script>
 </body>
