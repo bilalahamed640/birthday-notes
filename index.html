@@ -59,7 +59,7 @@
 <div class="bg" aria-hidden="true"></div>
 <div class="emoji-bg" aria-hidden="true"></div>
 <header>
-  <h1>🎉 Insarah’s Birthday Countdown <span id="musicIndicator" aria-hidden="true">🎵</span></h1>
+  <h1>🎉 Insarah’s Birthday Countdown 🧿🤍 <span id="musicIndicator" aria-hidden="true">🎵</span></h1>
   <div class="meta">
     <div id="countdown">Starts Sep 19 — <span id="daysLeft">loading...</span> left</div>
   </div>
@@ -104,7 +104,7 @@
         {date:'2025-10-05', title:"Calm Waves 🌊", text:"When life feels stormy, you are my calm sea. You’re my safe harbor and my peace."},
         {date:'2025-10-06', title:"Timeless You 🌹", text:"There’s a grace in you that feels timeless — the kind of beauty and kindness that never fades."},
         {date:'2025-10-07', title:"Almost There ✨", text:"Tomorrow is yours, and I can’t wait to celebrate everything about you. You’re my favorite day already."},
-        {date:'2025-10-08', title:"🎂 Happy Birthday, My Everything 🧿❤️", text:"Today belongs to you — but for me, every day does. Happy Birthday, love. You are my best wish come true.", confetti:true}
+        {date:'2025-10-08', title:"🎂 Happy Birthday, My Everything ❤️", text:"Today belongs to you — but for me, every day does. Happy Birthday, love. You are my best wish come true.", confetti:true}
       ];
 
       const songs = [
@@ -123,7 +123,9 @@
       const emojiBg = document.querySelector('.emoji-bg');
       const debugPanel = document.getElementById('debugPanel');
       const musicIndicator = document.getElementById('musicIndicator');
-      const todayStr = new Date().toISOString().split('T')[0];
+      // Use local date instead of UTC
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
 
       const confettiSafe = window.confetti ? window.confetti : function(opts){};
 
