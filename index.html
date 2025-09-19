@@ -1,269 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Birthday Notes 🎂</title>
+  <title>Insarah’s Birthday Countdown 🎉</title>
   <style>
     :root{--accent:#ff4081;--card-bg:#ffffff;--soft:#fff5f8}
     html,body{height:100%;margin:0}
-    body{font-family:Inter, Poppins, Arial, sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;color:#333}
+    body{font-family:Inter, Poppins, Arial, sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;color:#333;background:#fff}
     .bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(120deg,#ffe6f0,#fff9e6);animation:bgShift 12s ease-in-out infinite}
     @keyframes bgShift{0%{background:linear-gradient(120deg,#ffe6f0,#fff9e6)}50%{background:linear-gradient(120deg,#fff9e6,#e6f7ff)}100%{background:linear-gradient(120deg,#ffe6f0,#fff9e6)}}
 
-    /* scattered emoji background */
+    /* small scattered emoji background */
     .emoji-bg {position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
-    .emoji-bg span {position:absolute;font-size:24px;opacity:0.12;animation:floaty 14s infinite ease-in-out}
+    .emoji-bg span {position:absolute;font-size:22px;opacity:0.12;animation:floaty 14s infinite ease-in-out}
     @keyframes floaty {0%{transform:translateY(0px) rotate(0deg);}50%{transform:translateY(-22px) rotate(12deg);}100%{transform:translateY(0px) rotate(0deg);}}
 
-    header{width:100%;max-width:1100px;padding:18px;display:flex;flex-direction:column;align-items:center;margin-top:16px;background:rgba(255,255,255,0.72);backdrop-filter:blur(8px);border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
+    header{width:100%;max-width:1100px;padding:18px;display:flex;flex-direction:column;align-items:center;margin-top:16px;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
     h1{margin:0;font-size:22px;background:linear-gradient(90deg,#ff4081,#ff9800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-flex;align-items:center;gap:8px}
-    #musicIndicator{font-size:18px;opacity:0.6;transition:transform .25s,box-shadow .25s,opacity .25s}
-    #musicIndicator.on{transform:scale(1.18);box-shadow:0 0 14px rgba(255,64,129,0.65);opacity:1}
-
     .meta{display:flex;gap:12px;align-items:center;margin-top:12px}
     #countdown{font-weight:600;color:#444}
     #progressWrap{width:100%;max-width:760px;margin-top:14px}
     .progress{height:10px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden}
     .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff98c8);width:0%;transition:width 600ms ease}
+
     .container{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;padding:22px;max-width:1100px;width:100%;box-sizing:border-box}
     .cardWrap{perspective:1000px}
-    .card{background:var(--card-bg);border-radius:14px;padding:18px;text-align:center;box-shadow:0 8px 26px rgba(17,12,38,0.06);cursor:pointer;position:relative;overflow:visible;min-height:120px;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.3,1)}
+    .card{background:var(--card-bg);border-radius:14px;padding:18px;text-align:center;box-shadow:0 8px 26px rgba(17,12,38,0.06);cursor:pointer;position:relative;overflow:visible;min-height:140px;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.3,1)}
     .card.flipped{transform:rotateY(180deg)}
     .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;border-radius:14px;backface-visibility:hidden}
     .front{background:var(--card-bg)}
     .back{transform:rotateY(180deg);background:linear-gradient(180deg,#fff,#fff7fb)}
     .card h3{margin:0;font-size:16px}
-    .card p{margin-top:8px;color:#444;font-size:15px;line-height:1.3}
-    .badge {position: absolute;top: 12px;right: 12px;background: rgba(255,64,129,0.12);color: var(--accent);padding: 6px 8px;border-radius: 999px;font-size: 13px;transform: rotateY(0deg);backface-visibility: hidden;z-index: 3}
+    .card p{margin-top:10px;color:#444;font-size:15px;line-height:1.35;max-width:90%}
+    .badge {position:absolute;top:12px;right:12px;background:rgba(255,64,129,0.12);color:var(--accent);padding:6px 8px;border-radius:999px;font-size:13px;transform:rotateY(0deg);backface-visibility:hidden;z-index:3}
+
+    /* small play button inside the back */
+    .play-btn {
+      margin-top:14px;
+      border:0;
+      background:linear-gradient(90deg,#ff7aa8,#ffb4d9);
+      color:white;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(255,64,129,0.12);
+    }
+    .play-btn[disabled]{opacity:0.5;cursor:not-allowed}
+
     .emoji{position:fixed;pointer-events:none;z-index:9999;will-change:transform,opacity}
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
     .overlay.show{opacity:1;pointer-events:auto}
     .overlay .box{background:linear-gradient(90deg,#fff,#fff7fb);padding:30px 36px;border-radius:14px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,0.25)}
     .overlay h2{margin:0 0 8px;color:var(--accent);font-size:28px}
-    footer{margin:26px 0 46px;color:#777}
 
-    /* Locked card blur effect with glow */
-    .card.locked { pointer-events: none; position: relative; animation: pulseGlow 2.5s infinite; }
+    .card.locked { pointer-events: none; position: relative; animation:pulseGlow 2.5s infinite; }
     .card.locked .face { filter: blur(4px) brightness(0.9); }
-    .card.locked::after { content: "🔒"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 8px; font-weight: bold; color: var(--accent); z-index: 2; }
-    @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 10px rgba(255,64,129,0.3); } 50% { box-shadow: 0 0 22px rgba(255,64,129,0.6); } }
+    .card.locked::after { content:"🔒"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.85); padding:6px 12px; border-radius:8px; font-weight:bold; color:var(--accent); z-index:2 }
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 10px rgba(255,64,129,0.3)}50%{box-shadow:0 0 22px rgba(255,64,129,0.6)}}
 
-    /* debug panel (visible on localhost or with ?debug=1) */
-    #debugPanel{position:fixed;left:12px;bottom:12px;background:rgba(0,0,0,0.7);color:#fff;padding:8px 10px;border-radius:8px;font-size:12px;z-index:10000;display:none}
-
-    @media (max-width:520px){.card{min-height:140px}}
+    @media (max-width:520px){.card{min-height:160px}}
   </style>
 </head>
 <body>
 <div class="bg" aria-hidden="true"></div>
 <div class="emoji-bg" aria-hidden="true"></div>
+
 <header>
-  <h1>🎉 Insarah’s Birthday Countdown 🧿🤍 <span id="musicIndicator" aria-hidden="true">🎵</span></h1>
+  <h1>🎉 Insarah’s Birthday Countdown</h1>
   <div class="meta">
     <div id="countdown">Starts Sep 19 — <span id="daysLeft">loading...</span> left</div>
   </div>
-  <div id="progressWrap">
-    <div class="progress"><i id="progressBar"></i></div>
-  </div>
+  <div id="progressWrap"><div class="progress"><i id="progressBar"></i></div></div>
 </header>
 
 <section class="container" id="notesContainer" aria-live="polite"></section>
+
 <div class="overlay" id="birthdayOverlay">
   <div class="box">
     <h2>Happy Birthday! ❤️</h2>
     <p>Wishing you the most beautiful day — with all my love.</p>
   </div>
 </div>
+
 <audio id="bgAudio" preload="auto"></audio>
-<div id="debugPanel" aria-hidden="false"></div>
+
+<!-- canvas-confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
 <script>
-  document.addEventListener('DOMContentLoaded', ()=>{
-    try{
-      const preview = false; // set false before share — keep false for countdown
-      const nickname = "Chubby Cheek";
+  document.addEventListener('DOMContentLoaded', () => {
+    // --------------- CONFIG ---------------
+    // Change this string to force browsers to fetch new assets after you push (v4, v5...)
+    const version = "v2";
+     //preview=true will unlock all cards for testing on your local machine before sharing
+    const preview = false;
 
-      const notes = [
-        {date:'2025-09-19', title:"Couldn’t Wait 💌", text:"I couldn’t hold back — you’re already on my mind. You have this rare way of making me feel like the luckiest person alive just by existing."},
-        {date:'2025-09-20', title:"My Sunrise 🌅", text:"You’re the light that chases away my shadows. The warmth you carry makes everything around you brighter — especially me."},
-        {date:'2025-09-21', title:"Your Smile 🌸", text:"That smile of yours… it’s unfair how it owns my heart. It’s not just beautiful, it’s the kind of smile that heals people."},
-        {date:'2025-09-22', title:"My Calm 🤍", text:"The world feels noisy, but you bring me peace. You’re not only stunning outside, your calm heart is breathtaking too."},
-        {date:'2025-09-23', title:"Little Sparkles ✨", text:"Every laugh, every look, every little thing you do makes ordinary moments magical. You’re my favorite kind of sparkle."},
-        {date:'2025-09-24', title:"My Safe Place 🕊️", text:"I find comfort in you. Your presence feels like home — safe, warm, and exactly where I want to be."},
-        {date:'2025-09-25', title:"Made of Magic 🎨", text:"You turn ordinary days into stories worth remembering. That’s your magic — and it never fails to amaze me."},
-        {date:'2025-09-26', title:"The Way You Care 🌿", text:"Your kindness leaves soft fingerprints everywhere you go. You don’t just look beautiful — your heart is breathtaking."},
-        {date:'2025-09-27', title:"Cozy Thought ☕", text:"The thought of being beside you makes me feel at peace. You make simple moments feel like treasures."},
-        {date:'2025-09-28', title:"Joy Bringer 🌺", text:"You bring lightness into the room without even trying. Your presence is the kind of joy I never knew I needed."},
-        {date:'2025-09-29', title:"My Secret Smile 🌻", text:"You’re the reason behind the little smiles I give for no reason. Even when you’re not around, you’re with me."},
-        {date:'2025-09-30', title:"Warmth Like Home 🔥", text:"You feel like the coziest corner of the universe. With you, I’m warm in every way."},
-        {date:'2025-10-01', title:"Quiet Strength 🌊", text:"Your beauty is obvious, but your strength is even more stunning. You inspire me just by being you."},
-        {date:'2025-10-02', title:"Your Melody 🎵", text:"Every word you say feels like a song I want on repeat. You don’t just speak — you sing to my heart."},
-        {date:'2025-10-03', title:"Little Brave Things 💫", text:"Your courage is in the way you stay kind in a world that isn’t always kind back. You’re stronger than you know."},
-        {date:'2025-10-04', title:"Your Light 🌞", text:"You make everything around you shine brighter. You’re more radiant than the sun on its best day."},
-        {date:'2025-10-05', title:"Calm Waves 🌊", text:"When life feels stormy, you are my calm sea. You’re my safe harbor and my peace."},
-        {date:'2025-10-06', title:"Timeless You 🌹", text:"There’s a grace in you that feels timeless — the kind of beauty and kindness that never fades."},
-        {date:'2025-10-07', title:"Almost There ✨", text:"Tomorrow is yours, and I can’t wait to celebrate everything about you. You’re my favorite day already."},
-        {date:'2025-10-08', title:"🎂 Happy Birthday, My Everything ❤️", text:"Today belongs to you — but for me, every day does. Happy Birthday, love. You are my best wish come true.", confetti:true}
-      ];
+   // ---------- NOTES (emotional — shown on cards) ----------
+    const notes = [
+      {date:'2025-09-19', title:'A Beginning 💫', text:"Some stories start quietly, but from the very first moment… I felt something unforgettable with you."},
+      {date:'2025-09-20', title:'Falling Gently 🤍', text:"Being close to you feels effortless, like breathing — soft, natural, and full of warmth."},
+      {date:'2025-09-21', title:'Timeless Moments ⏳', text:"There are days I wish I could pause forever, just to hold on to you a little longer."},
+      {date:'2025-09-22', title:'My Perfect Constant ✨', text:"You don’t even try, yet you’re everything I’ve ever wanted — perfectly you."},
+      {date:'2025-09-23', title:'Drawn Back to You ❤️', text:"No matter where life takes me, my heart always finds its way back to you."},
+      {date:'2025-09-24', title:'All of You 🌹', text:"I wouldn’t change a single thing about you — you’re beautifully whole just as you are."},
+      {date:'2025-09-25', title:'The Whole World Knows 🌍', text:"When I think of love, it feels like even the universe is quietly singing your name."},
+      {date:'2025-09-26', title:'This Must Be Love 💌', text:"I can’t explain it neatly — it’s messy, real, and powerful… but I know it’s love."},
+      {date:'2025-09-27', title:'My Constant Flame 🔥', text:"You linger in my heart like a song I never want to end."},
+      {date:'2025-09-28', title:'The Color You Bring 🌼', text:"The world feels brighter, softer, and warmer just because you’re in it."},
+      {date:'2025-09-29', title:'Finding You 🌸', text:"I didn’t even know I was searching… until I found you, and everything made sense."},
+      {date:'2025-09-30', title:'Until You 💕', text:"Life felt incomplete until you stepped into it — now, every piece fits."},
+      {date:'2025-10-01', title:'Soft Fire 🕯️', text:"You’re calm yet powerful — a quiet strength that steadies me every day."},
+      {date:'2025-10-02', title:'A Forever Feeling ✨', text:"Being with you feels like forever isn’t long enough."},
+      {date:'2025-10-03', title:'Painted in Love 🎨', text:"You’re poetry in motion, every word and every color reminding me of love."},
+      {date:'2025-10-04', title:'Between Us 💫', text:"Somewhere between your silence and your words, I find my favorite place — us."},
+      {date:'2025-10-05', title:'A Wish Come True 🌠', text:"If I had just one wish, it would always be you. And somehow, I already have you."},
+      {date:'2025-10-06', title:'Soft Light 🌸', text:"Like a sunset melting into the sky, you bring beauty and peace into my world."},
+      {date:'2025-10-07', title:'Where I Belong 🏡', text:"With you, I don’t feel lost or searching anymore — I’ve found my home in your heart."},
+      {date:'2025-10-08', title:'For You, Always 🎂❤️', text:"Happy Birthday, my love. Today is yours, but my heart belongs to you every day.", confetti:true}
+    ];
 
-      const songs = [
-        'music/2025-09-19.mp3','music/2025-09-20.mp3','music/2025-09-21.mp3','music/2025-09-22.mp3',
-        'music/2025-09-23.mp3','music/2025-09-24.mp3','music/2025-09-25.mp3','music/2025-09-26.mp3','music/2025-09-27.mp3',
-        'music/2025-09-28.mp3','music/2025-09-29.mp3','music/2025-09-30.mp3','music/2025-10-01.mp3',
-        'music/2025-10-02.mp3','music/2025-10-03.mp3','music/2025-10-04.mp3','music/2025-10-05.mp3',
-        'music/2025-10-06.mp3','music/2025-10-07.mp3','music/2025-10-08.mp3'
-      ];
+    /* ===========================================================
+       SONG MAPPING (for your reference only — do not show on cards)
+       Keep this block private if you don't want song names visible in source.
+       (Make sure /music/ contains these files named exactly)
+    ===========================================================
+    2025-09-19 → Raabta
+    2025-09-20 → Can't Help Falling (Acoustic)
+    2025-09-21 → In Dino
+    2025-09-22 → Perfect
+    2025-09-23 → Phir Le Aya Dil
+    2025-09-24 → All of Me
+    2025-09-25 → Hum Tere Pyar Mein Sara Alam
+    2025-09-26 → I Think They Call This Love
+    2025-09-27 → Aashiq Tera
+    2025-09-28 → Yellow
+    2025-09-29 → Finding Her
+    2025-09-30 → Until I Found You
+    2025-10-01 → Irraday
+    2025-10-02 → We Fell in Love in October
+    2025-10-03 → O Rangrez
+    2025-10-04 → Darmiyaan
+    2025-10-05 → Wishes
+    2025-10-06 → Pink + White
+    2025-10-07 → I'm Into You
+    2025-10-08 → Die With Me
+    =========================================================== */
 
-      const container = document.getElementById('notesContainer');
-      const progressBar = document.getElementById('progressBar');
-      const daysLeftEl = document.getElementById('daysLeft');
-      const bgAudio = document.getElementById('bgAudio');
-      const overlay = document.getElementById('birthdayOverlay');
-      const emojiBg = document.querySelector('.emoji-bg');
-      const debugPanel = document.getElementById('debugPanel');
-      const musicIndicator = document.getElementById('musicIndicator');
-      // Use local date instead of UTC
-      const today = new Date();
-      const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    // songs: filenames must exist in /music/, we append version for cache-busting
+    const songs = [
+      'music/2025-09-19.mp3','music/2025-09-20.mp3','music/2025-09-21.mp3','music/2025-09-22.mp3',
+      'music/2025-09-23.mp3','music/2025-09-24.mp3','music/2025-09-25.mp3','music/2025-09-26.mp3',
+      'music/2025-09-27.mp3','music/2025-09-28.mp3','music/2025-09-29.mp3','music/2025-09-30.mp3',
+      'music/2025-10-01.mp3','music/2025-10-02.mp3','music/2025-10-03.mp3','music/2025-10-04.mp3',
+      'music/2025-10-05.mp3','music/2025-10-06.mp3','music/2025-10-07.mp3','music/2025-10-08.mp3'
+    ].map(s => s + "?" + version);
 
-      const confettiSafe = window.confetti ? window.confetti : function(opts){};
+    // DOM refs
+    const container = document.getElementById('notesContainer');
+    const progressBar = document.getElementById('progressBar');
+    const daysLeftEl = document.getElementById('daysLeft');
+    const bgAudio = document.getElementById('bgAudio');
+    const overlay = document.getElementById('birthdayOverlay');
+    const emojiBg = document.querySelector('.emoji-bg');
 
-      // helper to update the header music indicator
-      function updateMusicIndicator(){
-        try{
-          if(!musicIndicator) return;
-          if(bgAudio && bgAudio.loop){ musicIndicator.classList.add('on'); }
-          else { musicIndicator.classList.remove('on'); }
-        }catch(e){console.warn('music ind err',e)}
+    // local date string (browser timezone)
+    const now = new Date();
+    const todayStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
+
+    // create faint scattered emojis in background
+    (function createBgEmojis(){
+      const list = ["💖","💕","🌸","✨","🌟"];
+      for(let i=0;i<20;i++){
+        const s = document.createElement('span');
+        s.textContent = list[Math.floor(Math.random()*list.length)];
+        s.style.left = Math.random()*100 + 'vw';
+        s.style.top = Math.random()*100 + 'vh';
+        s.style.fontSize = (12 + Math.random()*28) + 'px';
+        s.style.animationDelay = (Math.random()*14) + 's';
+        emojiBg.appendChild(s);
       }
+    })();
 
-      // debug panel (visible if localhost or ?debug=1)
-      function updateDebugPanel(){
-        try{
-          const show = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.search.includes('debug=1'));
-          if(!debugPanel) return;
-          if(show){
-            debugPanel.style.display = 'block';
-            const unlocked = notes.filter(n => (preview || todayStr >= n.date)).length;
-            debugPanel.innerHTML = `today: ${todayStr}<br>preview: ${preview}<br>unlocked: ${unlocked}<br>audio.src: ${bgAudio.currentSrc||bgAudio.src||''}<br>looping: ${bgAudio.loop}`;
-          } else { debugPanel.style.display = 'none'; }
-        }catch(e){console.warn('dbg err',e)}
-      }
-
-      // scatter faint background emojis
-      try{
-        const bgEmojis = ["💖","💕","💘","💞","🌸","🌟","✨"];
-        if(emojiBg){
-          for(let i=0;i<36;i++){
-            const s=document.createElement('span');
-            s.textContent = bgEmojis[Math.floor(Math.random()*bgEmojis.length)];
-            s.style.left = Math.random()*100 + 'vw';
-            s.style.top = Math.random()*100 + 'vh';
-            s.style.fontSize = (16+Math.random()*26)+'px';
-            s.style.animationDelay = (Math.random()*12)+'s';
-            emojiBg.appendChild(s);
-          }
-        }
-      }catch(e){console.warn('emoji bg failed',e)}
-
-      function updateProgress(){
-        const start = new Date('2025-09-19');
-        const end = new Date('2025-10-08');
-        const today = new Date();
-        const total = Math.round((end - start) / (1000*60*60*24));
-        const passed = Math.max(0, Math.min(total, Math.round((today - start)/(1000*60*60*24))));
-        const pct = Math.round((passed / total) * 100);
-        if(progressBar) progressBar.style.width = pct + '%';
-        const left = Math.max(Math.round((end - today)/(1000*60*60*24)),0);
-        if(daysLeftEl) daysLeftEl.textContent = left + ' day' + (left===1?'':'s');
-        updateDebugPanel();
-      }
-      updateProgress();
-
-      // play once helper
-      function playSongImmediate(src){
-        try{
-          bgAudio.loop = bgAudio.loop || false; // safe
-          if(!bgAudio.src || bgAudio.paused || (bgAudio.currentSrc && !bgAudio.currentSrc.includes(src))){
-            bgAudio.src = src; bgAudio.volume = 0.35;
-            const p = bgAudio.play();
-            if(p && typeof p.then === 'function'){
-              p.catch(err=>{ console.warn('Direct play blocked', err); });
-            }
-            updateDebugPanel(); updateMusicIndicator();
-            return;
-          }
-        }catch(e){ console.log('playSongImmediate err', e); }
-      }
-
-      function fullScreenEmoji(list,count=40){
-        for(let i=0;i<count;i++){
-          const el=document.createElement('div'); el.className='emoji'; el.textContent=list[Math.floor(Math.random()*list.length)];
-          const size=14+Math.random()*36; el.style.fontSize=size+'px';
-          el.style.left=Math.random()*100+'vw'; el.style.top='-40px'; document.body.appendChild(el);
-          const xMove=(Math.random()-0.5)*(innerWidth*0.6); const yMove=innerHeight+100; const rot=(Math.random()-0.5)*720;
-          const duration=3+Math.random()*2;
-          el.style.transition=`transform ${duration}s cubic-bezier(.2,.9,.3,1), opacity ${duration}s linear`;
-          setTimeout(()=>{ el.style.transform=`translate(${xMove}px, ${yMove}px) rotate(${rot}deg)`; el.style.opacity=0; },30);
-          setTimeout(()=>el.remove(),(duration*1000)+600);
-        }
-      }
-
-      // build cards
-      notes.forEach((note,idx)=>{
-        const wrap=document.createElement('div'); wrap.className='cardWrap';
-        const card=document.createElement('div'); card.className='card';
-        const front=document.createElement('div'); front.className='face front';
-        front.innerHTML=`<h3>${note.title}</h3><p style=\"font-weight:600;color:#888\">Tap to open</p>`;
-        const back=document.createElement('div'); back.className='face back';
-        back.innerHTML=`<h3>${note.title}</h3><p>${note.text}</p>`;
-        card.appendChild(front); card.appendChild(back); wrap.appendChild(card);
-        const badge=document.createElement('div'); badge.className='badge';
-        const unlocked=preview ? true : (todayStr >= note.date);
-        badge.textContent=unlocked?'Open':'Locked'; card.appendChild(badge);
-        if(unlocked){
-          card.addEventListener('click',()=>{
-            if(card.classList.contains('flipped')) return;
-            card.classList.add('flipped');
-
-            // loop automatically if this is today's card
-            if(note.date === todayStr){ bgAudio.loop = true; } else { bgAudio.loop = false; }
-
-            if(note.confetti){
-              fullScreenEmoji(['💖','💕','💘','💞','💟'],120);
-              overlay.classList.add('show');
-              const duration=3000; const interval=450; let elapsed=0;
-              const timer=setInterval(()=>{ confettiSafe({particleCount:220,spread:160}); elapsed+=interval; if(elapsed>=duration) clearInterval(timer); },interval);
-              setTimeout(()=>overlay.classList.remove('show'),duration+800);
-            } else {
-              fullScreenEmoji(['💖','💕','💘','💞','💟'],28);
-            }
-
-            playSongImmediate(songs[idx]);
-            updateMusicIndicator(); updateDebugPanel();
-            updateProgress();
-          });
-        } else {
-          card.classList.add('locked');
-        }
-        container.appendChild(wrap);
-      });
-
-      // audio event listeners to keep indicator in sync
-      try{
-        bgAudio.addEventListener('play', ()=>{ updateMusicIndicator(); updateDebugPanel(); });
-        bgAudio.addEventListener('pause', ()=>{ updateMusicIndicator(); updateDebugPanel(); });
-        bgAudio.addEventListener('ended', ()=>{ updateMusicIndicator(); updateDebugPanel(); });
-        bgAudio.addEventListener('error', (e)=>{ console.error('bgAudio error', e); updateDebugPanel(); });
-      }catch(e){console.warn('audio listeners failed',e)}
-
-      // initial debug update
-      updateDebugPanel();
-
-    }catch(err){
-      console.error('Initialization error', err);
+    function updateProgress(){
+      const start = new Date('2025-09-19');
+      const end = new Date('2025-10-08');
+      const now = new Date();
+      const total = Math.round((end - start) / (1000*60*60*24));
+      const passed = Math.max(0, Math.min(total, Math.round((now - start)/(1000*60*60*24))));
+      const pct = Math.round((passed / total) * 100);
+      progressBar.style.width = pct + '%';
+      const left = Math.max(Math.round((end - now)/(1000*60*60*24)),0);
+      daysLeftEl.textContent = left + ' day' + (left===1?'':'s');
     }
+
+    // play helper
+    function playSongImmediate(src, loop=false){
+      try{
+        if(!src) return;
+        bgAudio.loop = !!loop;
+        // only change src if different (helps some mobile UX)
+        if(!bgAudio.src || !bgAudio.currentSrc || !bgAudio.currentSrc.includes(src)) {
+          bgAudio.src = src;
+        }
+        const p = bgAudio.play();
+        if(p && typeof p.then === 'function') p.catch(()=>{});
+      }catch(e){ console.warn('play error', e); }
+      updatePlayButtons();
+    }
+
+    function stopAudio(){
+      try{ bgAudio.pause(); bgAudio.currentTime = 0; bgAudio.loop = false; } catch(e){}
+      updatePlayButtons();
+    }
+
+    // falling emoji animation
+    function fullScreenEmoji(list,count=40, speedFactor=1){
+      for(let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'emoji';
+        el.textContent = list[Math.floor(Math.random()*list.length)];
+        const size = 14 + Math.random()*36 * (speedFactor<1?0.9:1.1);
+        el.style.fontSize = size + 'px';
+        el.style.left = (Math.random()*90) + 'vw';
+        el.style.top = '-40px';
+        document.body.appendChild(el);
+        const xMove = (Math.random()-0.5)*(innerWidth*0.6);
+        const yMove = innerHeight + 200;
+        const rot = (Math.random()-0.5)*720;
+        const duration = (2.8 + Math.random()*2.4) * speedFactor;
+        el.style.transition = `transform ${duration}s cubic-bezier(.2,.9,.3,1), opacity ${duration}s linear`;
+        setTimeout(()=>{ el.style.transform = `translate(${xMove}px, ${yMove}px) rotate(${rot}deg)`; el.style.opacity = 0; }, 30);
+        setTimeout(()=>el.remove(), (duration*1000)+800);
+      }
+    }
+
+    // long confetti (finale)
+    function runLongConfetti(totalDuration = 9000, perInterval = 400){
+      const end = Date.now() + totalDuration;
+      const run = () => {
+        if(Date.now() > end) return;
+        try {
+          confetti({ particleCount: 180, spread: 160, origin: { x: Math.random(), y: Math.random() * 0.2 }});
+          confetti({ particleCount: 110, spread: 200, origin: { x: Math.random(), y: Math.random() * 0.2 }});
+        } catch(e) { /* ignore */ }
+      };
+      run();
+      const iv = setInterval(()=> {
+        if(Date.now() > end){ clearInterval(iv); return; }
+        run();
+      }, perInterval);
+      setTimeout(()=> clearInterval(iv), totalDuration + 200);
+    }
+
+    // ---- build cards ----
+    let currentOpenIndex = null;
+    const playButtons = []; // keep references
+
+    notes.forEach((note, idx) => {
+      const wrap = document.createElement('div'); wrap.className = 'cardWrap';
+      const card = document.createElement('div'); card.className = 'card';
+      const front = document.createElement('div'); front.className = 'face front';
+      front.innerHTML = `<h3>${note.title}</h3><p style="font-weight:600;color:#888">Tap to open</p>`;
+      const back = document.createElement('div'); back.className = 'face back';
+      // back content includes a dedicated Play button for this day's song
+      back.innerHTML = `<h3>${note.title}</h3><p>${note.text}</p>`;
+      const playBtn = document.createElement('button');
+      playBtn.className = 'play-btn';
+      playBtn.textContent = 'Play ▶';
+      playBtn.disabled = true; // initially disabled until opened
+      // stop propagation so clicking button doesn't trigger card click
+      playBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        // only act for currently open card
+        if(currentOpenIndex !== idx) return;
+        const src = songs[idx];
+        // if audio not set to this src, set and play (loop enabled when toggled)
+        if(!bgAudio.currentSrc || !bgAudio.currentSrc.includes(src)) {
+          bgAudio.src = src;
+          bgAudio.loop = true; // when user actively presses play we set loop on (their earlier request)
+          bgAudio.volume = 0.35;
+          bgAudio.play().catch(()=>{});
+        } else {
+          // toggle
+          if(bgAudio.paused) {
+            bgAudio.play().catch(()=>{});
+          } else {
+            bgAudio.pause();
+          }
+        }
+        updatePlayButtons();
+      });
+      back.appendChild(playBtn);
+
+      card.appendChild(front);
+      card.appendChild(back);
+      wrap.appendChild(card);
+
+      const badge = document.createElement('div'); badge.className = 'badge';
+      const unlocked = preview ? true : (todayStr >= note.date);
+      badge.textContent = unlocked ? 'Open' : 'Locked';
+      card.appendChild(badge);
+
+      // store button ref
+      playButtons.push(playBtn);
+
+      if(unlocked){
+        card.addEventListener('click', () => {
+          const wasFlipped = card.classList.contains('flipped');
+          if(!wasFlipped) card.classList.add('flipped');
+          // mark current open index
+          currentOpenIndex = idx;
+          // enable this play button and disable others
+          playButtons.forEach((b,i)=> b.disabled = (i !== idx));
+
+          // animation / emoji
+          if(note.confetti){
+            // finale
+            fullScreenEmoji(['💖','💕','💘','💞','💟','🌸','✨'], 160, 0.95);
+            overlay.classList.add('show');
+            runLongConfetti(10000, 420); // 10s celebration
+            setTimeout(()=> overlay.classList.remove('show'), 10000 + 700);
+            // play final song on loop
+            playSongImmediate(songs[idx], true);
+            // reflect play button text
+            playBtn.textContent = 'Pause ❚❚';
+            playBtn.disabled = false;
+          } else {
+            // regular day (slower falling emoji)
+            fullScreenEmoji(['💖','💕','💘','💞','💟','🌸'], 28, 1.6);
+            // loop automatically if it's today's date (so if she opens on that day it loops)
+            const shouldLoop = note.date === todayStr;
+            playSongImmediate(songs[idx], shouldLoop);
+            playBtn.disabled = false;
+            // if it auto-looped make button indicate Pause
+            setTimeout(()=> updatePlayButtons(), 100);
+          }
+
+          // allow replay on subsequent clicks: if already flipped we still play/animate
+        });
+      } else {
+        card.classList.add('locked');
+      }
+
+      container.appendChild(wrap);
+    });
+
+    // update play button labels according to audio state & active card
+    function updatePlayButtons(){
+      playButtons.forEach((btn, i) => {
+        const active = (i === currentOpenIndex);
+        if(!active){ btn.textContent = 'Play ▶'; btn.disabled = true; return; }
+        // active card
+        if(bgAudio.src && bgAudio.currentSrc && bgAudio.currentSrc.includes(songs[i].split('?')[0])) {
+          if(bgAudio.paused) { btn.textContent = 'Play ▶'; }
+          else { btn.textContent = 'Pause ❚❚'; }
+        } else {
+          btn.textContent = 'Play ▶';
+        }
+        btn.disabled = false;
+      });
+    }
+
+    // audio event listeners: keep buttons & indicators in sync
+    bgAudio.addEventListener('play', updatePlayButtons);
+    bgAudio.addEventListener('pause', updatePlayButtons);
+    bgAudio.addEventListener('ended', updatePlayButtons);
+    bgAudio.addEventListener('error', (e) => { console.warn('audio error', e); updatePlayButtons(); });
+
+    // initialize progress
+    updateProgress();
+
+    // expose small helper on window for testing (optional)
+    window._bday = {
+      notes, songs, version,
+      // helper to force-unlock all cards (for quick local testing)
+      unlockAllForTest: () => {
+        document.querySelectorAll('.card.locked').forEach(c => c.classList.remove('locked'));
+        document.querySelectorAll('.badge').forEach(b => b.textContent = 'Open');
+      }
+    };
   });
 </script>
 </body>
